@@ -16,12 +16,6 @@ interface TaskModalProps {
 
 const PRIORITIES: Priority[] = ['low', 'medium', 'high']
 
-const priorityColors: Record<Priority, string> = {
-  low: 'text-[#a1a1aa]',
-  medium: 'text-[#f59e0b]',
-  high: 'text-[#ef4444]',
-}
-
 export function TaskModal({ open, onClose, onSave, initialData }: TaskModalProps) {
   const [title, setTitle] = useState('')
   const [subject, setSubject] = useState('')
@@ -30,7 +24,6 @@ export function TaskModal({ open, onClose, onSave, initialData }: TaskModalProps
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // Reset form when modal opens
   useEffect(() => {
     if (open) {
       setTitle(initialData?.title ?? '')
@@ -43,9 +36,9 @@ export function TaskModal({ open, onClose, onSave, initialData }: TaskModalProps
 
   function validate() {
     const e: Record<string, string> = {}
-    if (!title.trim()) e.title = 'Title is required'
-    if (!subject.trim()) e.subject = 'Subject is required'
-    if (!dueDate) e.dueDate = 'Due date is required'
+    if (!title.trim()) e.title = 'TITLE IS REQUIRED'
+    if (!subject.trim()) e.subject = 'SUBJECT IS REQUIRED'
+    if (!dueDate) e.dueDate = 'DUE DATE IS REQUIRED'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -63,9 +56,9 @@ export function TaskModal({ open, onClose, onSave, initialData }: TaskModalProps
     <Modal
       open={open}
       onClose={onClose}
-      title={initialData ? 'Edit task' : 'New task'}
+      title={initialData ? 'EDIT TASK' : 'NEW TASK'}
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
         <Input
           label="Task title"
           placeholder="e.g. Submit lab report"
@@ -83,14 +76,9 @@ export function TaskModal({ open, onClose, onSave, initialData }: TaskModalProps
           error={errors.subject}
         />
 
-        {/* Priority segmented control */}
-        <div className="flex flex-col gap-1.5">
-          <span className="text-sm text-[#a1a1aa] font-medium">Priority</span>
-          <div
-            className="flex gap-1 p-1 rounded-xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)]"
-            role="radiogroup"
-            aria-label="Priority"
-          >
+        <div className="flex flex-col gap-2">
+          <span className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#7A7A7A] uppercase tracking-widest">Priority</span>
+          <div className="grid grid-cols-3 border border-[rgba(255,255,255,0.22)]" role="radiogroup" aria-label="Priority">
             {PRIORITIES.map(p => (
               <button
                 key={p}
@@ -99,10 +87,11 @@ export function TaskModal({ open, onClose, onSave, initialData }: TaskModalProps
                 aria-checked={priority === p}
                 onClick={() => setPriority(p)}
                 className={`
-                  flex-1 py-2 rounded-lg text-sm font-medium capitalize transition-colors duration-150
+                  py-2.5 font-[family-name:var(--font-jetbrains-mono)] text-[11px] uppercase tracking-widest transition-colors
+                  border-r border-[rgba(255,255,255,0.14)] last:border-r-0
                   ${priority === p
-                    ? `bg-[rgba(255,255,255,0.10)] ${priorityColors[p]}`
-                    : 'text-[#71717a] hover:text-[#a1a1aa]'
+                    ? p === 'high' ? 'bg-[#E5342B] text-black' : 'bg-[#FAFAFA] text-black'
+                    : 'text-[#7A7A7A] hover:text-[#FAFAFA] hover:bg-[#151515]'
                   }
                 `}
               >
@@ -121,12 +110,12 @@ export function TaskModal({ open, onClose, onSave, initialData }: TaskModalProps
           min={todayISO()}
         />
 
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-3 pt-1">
           <Button variant="ghost" type="button" onClick={onClose} className="flex-1">
-            Cancel
+            CANCEL
           </Button>
-          <Button type="submit" loading={loading} className="flex-1">
-            {initialData ? 'Save changes' : 'Add task'}
+          <Button variant="primary" type="submit" loading={loading} className="flex-1">
+            {initialData ? 'SAVE' : 'ADD TASK'}
           </Button>
         </div>
       </form>

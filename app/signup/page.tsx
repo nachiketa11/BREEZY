@@ -39,24 +39,23 @@ export default function SignupPage() {
       return
     }
 
-    toast.success('Account created — let\'s set up your profile')
+    toast.success('Account created')
     router.push('/onboarding')
     router.refresh()
   }
 
   return (
-    <div className="min-h-dvh flex items-center justify-center p-4 bg-[#09090b]">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,211,238,0.05)_0%,transparent_70%)] pointer-events-none" />
-
-      <div className="glass w-full max-w-sm p-8 flex flex-col gap-6 relative z-10">
-        <div className="text-center">
-          <span className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold bg-gradient-to-r from-[#a855f7] to-[#22d3ee] bg-clip-text text-transparent">
-            Breezy
-          </span>
-          <p className="mt-2 text-sm text-[#a1a1aa]">Create your student account</p>
+    <div className="min-h-dvh flex items-center justify-center p-5 bg-black">
+      <div className="w-full max-w-sm border border-[rgba(255,255,255,0.22)] bg-[#0D0D0D]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-dashed border-[rgba(255,255,255,0.14)]">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-[#E5342B] rounded-full" />
+            <span className="text-sm font-semibold tracking-wide">BREEZY</span>
+          </div>
+          <span className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#454545]">NEW ACCOUNT</span>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+        <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-5" noValidate>
           <Input
             label="University email"
             type="email"
@@ -86,22 +85,22 @@ export default function SignupPage() {
           />
 
           {error && (
-            <p className="text-sm text-[#ef4444] bg-[rgba(239,68,68,0.08)] border border-[rgba(239,68,68,0.2)] rounded-xl px-3 py-2">
-              {error}
+            <p className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#E5342B] border border-[rgba(229,52,43,0.5)] bg-[rgba(229,52,43,0.14)] px-3 py-2">
+              {error.toUpperCase()}
             </p>
           )}
 
-          <Button type="submit" loading={loading} className="w-full mt-1">
-            Create account
+          <Button variant="primary" type="submit" loading={loading} className="w-full">
+            CREATE ACCOUNT →
           </Button>
         </form>
 
-        <p className="text-center text-sm text-[#71717a]">
-          Already have an account?{' '}
-          <Link href="/login" className="text-[#a855f7] hover:text-[#c084fc] transition-colors">
-            Sign in
+        <div className="px-6 py-4 border-t border-dashed border-[rgba(255,255,255,0.14)] text-center font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#7A7A7A]">
+          HAVE AN ACCOUNT?{' '}
+          <Link href="/login" className="text-[#FAFAFA] underline underline-offset-4 hover:text-[#E5342B]">
+            SIGN IN
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   )

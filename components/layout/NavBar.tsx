@@ -2,20 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {
-  LayoutDashboard,
-  CheckSquare,
-  GraduationCap,
-  CalendarDays,
-  User,
-} from 'lucide-react'
 
 const NAV_ITEMS = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/tasks', icon: CheckSquare, label: 'Tasks' },
-  { href: '/attendance', icon: GraduationCap, label: 'Attendance' },
-  { href: '/timeline', icon: CalendarDays, label: 'Timeline' },
-  { href: '/profile', icon: User, label: 'Profile' },
+  { href: '/dashboard', label: 'DASHBOARD', idx: '01' },
+  { href: '/tasks', label: 'TASKS', idx: '02' },
+  { href: '/attendance', label: 'ATTENDANCE', idx: '03' },
+  { href: '/timeline', label: 'TIMELINE', idx: '04' },
+  { href: '/profile', label: 'PROFILE', idx: '05' },
 ]
 
 export function NavBar() {
@@ -23,66 +16,78 @@ export function NavBar() {
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col gap-1 w-56 shrink-0 py-8 pl-6 pr-4">
-        {/* Logo */}
-        <div className="mb-8 px-2">
-          <span className="font-[family-name:var(--font-space-grotesk)] text-xl font-bold bg-gradient-to-r from-[#a855f7] to-[#22d3ee] bg-clip-text text-transparent">
-            Breezy
-          </span>
+      {/* Desktop sidebar — spec sheet style */}
+      <aside className="hidden md:flex flex-col w-60 shrink-0 border-r border-dashed border-[rgba(255,255,255,0.14)] min-h-dvh sticky top-0">
+        <div className="px-6 py-6 border-b border-dashed border-[rgba(255,255,255,0.14)] flex items-center gap-2.5">
+          <div className="w-2 h-2 bg-[#E5342B] rounded-full shrink-0" />
+          <span className="text-[16px] font-semibold tracking-wide">BREEZY</span>
         </div>
 
-        <nav aria-label="Main navigation">
-          {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
+        <nav aria-label="Main navigation" className="flex-1 py-2">
+          {NAV_ITEMS.map(({ href, label, idx }) => {
+            const active = pathname === href || pathname.startsWith(href + '/')
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={active ? 'page' : undefined}
+                className={`
+                  flex items-center justify-between px-6 py-3.5
+                  font-[family-name:var(--font-jetbrains-mono)] text-[12px] tracking-widest
+                  border-l-2 transition-colors
+                  ${active
+                    ? 'border-[#E5342B] text-[#FAFAFA] bg-[rgba(229,52,43,0.06)]'
+                    : 'border-transparent text-[#7A7A7A] hover:text-[#FAFAFA] hover:bg-[#0D0D0D]'
+                  }
+                `}
+              >
+                <span>{active ? `> ${label}` : `  ${label}`}</span>
+                <span className="text-[#454545] text-[11px]">{idx}</span>
+              </Link>
+            )
+          })}
+        </nav>
+
+        <div className="px-6 py-5 border-t border-dashed border-[rgba(255,255,255,0.14)] font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#454545] flex items-center gap-2">
+          <div className="nos-pulse" />
+          SYSTEM ONLINE
+        </div>
+      </aside>
+
+      {/* Mobile top bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-black border-b border-dashed border-[rgba(255,255,255,0.14)]">
+        <div className="flex items-center justify-between px-5 py-3.5">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-[#E5342B] rounded-full" />
+            <span className="text-sm font-semibold tracking-wide">BREEZY</span>
+          </div>
+          <div className="flex items-center gap-2 font-[family-name:var(--font-jetbrains-mono)] text-[10px] text-[#7A7A7A]">
+            <div className="nos-pulse" />
+            ONLINE
+          </div>
+        </div>
+        <nav className="flex overflow-x-auto border-t border-dashed border-[rgba(255,255,255,0.14)]" aria-label="Mobile navigation">
+          {NAV_ITEMS.map(({ href, label }) => {
+            const short = label.slice(0, 4)
             const active = pathname === href
             return (
               <Link
                 key={href}
                 href={href}
-                className={`
-                  flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
-                  transition-colors duration-150 group
-                  ${active
-                    ? 'bg-[rgba(168,85,247,0.15)] text-[#a855f7]'
-                    : 'text-[#71717a] hover:text-[#f4f4f5] hover:bg-[rgba(255,255,255,0.06)]'
-                  }
-                `}
                 aria-current={active ? 'page' : undefined}
+                className={`
+                  flex-1 text-center px-2 py-3 font-[family-name:var(--font-jetbrains-mono)] text-[10px] tracking-widest whitespace-nowrap
+                  ${active ? 'text-[#E5342B] border-b border-[#E5342B]' : 'text-[#7A7A7A]'}
+                `}
               >
-                <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-                {label}
+                {short}
               </Link>
             )
           })}
         </nav>
-      </aside>
+      </div>
 
-      {/* Mobile Bottom Nav */}
-      <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center h-16 px-2
-          bg-[rgba(9,9,11,0.90)] border-t border-[rgba(255,255,255,0.08)] backdrop-blur-xl"
-        aria-label="Mobile navigation"
-      >
-        {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
-          const active = pathname === href
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`
-                flex flex-col items-center gap-1 py-2 px-3 rounded-xl text-xs
-                transition-colors duration-150
-                ${active ? 'text-[#a855f7]' : 'text-[#52525b]'}
-              `}
-              aria-label={label}
-              aria-current={active ? 'page' : undefined}
-            >
-              <Icon className="w-5 h-5" aria-hidden="true" />
-              <span className="hidden xs:block">{label}</span>
-            </Link>
-          )
-        })}
-      </nav>
+      {/* Mobile bottom spacer handled by layout padding */}
     </>
   )
 }

@@ -2,12 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { toast } from 'sonner'
-import { ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react'
 
 type Step = 1 | 2 | 3
 
@@ -29,18 +27,17 @@ export default function OnboardingPage() {
   const [error, setError] = useState('')
 
   const totalSteps = 3
-  const progress = (step / totalSteps) * 100
 
   function next() {
     setError('')
-    if (step === 1 && !name.trim()) { setError('Please enter your name'); return }
-    if (step === 2 && !branch) { setError('Please select your branch'); return }
-    if (step === 3 && !semester) { setError('Please select your semester'); return }
+    if (step === 1 && !name.trim()) { setError('ENTER YOUR NAME'); return }
+    if (step === 2 && !branch) { setError('PICK YOUR BRANCH'); return }
+    if (step === 3 && !semester) { setError('PICK YOUR SEMESTER'); return }
     if (step < 3) setStep((s) => (s + 1) as Step)
   }
 
   async function submit() {
-    if (!semester) { setError('Please select your semester'); return }
+    if (!semester) { setError('PICK YOUR SEMESTER'); return }
     setError('')
     setLoading(true)
 
@@ -58,152 +55,122 @@ export default function OnboardingPage() {
 
     setLoading(false)
     if (dbError) {
-      setError(dbError.message)
+      setError(dbError.message.toUpperCase())
       toast.error('Failed to save profile')
       return
     }
 
-    toast.success('Profile saved — welcome to Breezy!')
+    toast.success('Welcome to Breezy')
     router.push('/dashboard')
   }
 
   return (
-    <div className="min-h-dvh flex items-center justify-center p-4 bg-[#09090b]">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_60%_40%,rgba(168,85,247,0.08)_0%,transparent_60%)] pointer-events-none" />
-
-      <div className="glass w-full max-w-md p-8 flex flex-col gap-8 relative z-10">
-        {/* Header */}
-        <div>
-          <span className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold bg-gradient-to-r from-[#a855f7] to-[#22d3ee] bg-clip-text text-transparent">
-            Breezy
-          </span>
-          <p className="mt-1 text-sm text-[#a1a1aa]">Step {step} of {totalSteps}</p>
-
-          {/* Progress bar */}
-          <div className="mt-3 h-1 rounded-full bg-[rgba(255,255,255,0.08)] overflow-hidden">
-            <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-[#a855f7] to-[#22d3ee]"
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.4, ease: 'easeOut' }}
+    <div className="min-h-dvh flex items-center justify-center p-5 bg-black">
+      <div className="w-full max-w-md border border-[rgba(255,255,255,0.22)] bg-[#0D0D0D]">
+        <div className="px-6 py-4 border-b border-dashed border-[rgba(255,255,255,0.14)]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-[#E5342B] rounded-full" />
+              <span className="text-sm font-semibold tracking-wide">BREEZY</span>
+            </div>
+            <span className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#454545]">
+              STEP {step}/{totalSteps}
+            </span>
+          </div>
+          <div className="mt-3 h-px bg-[rgba(255,255,255,0.14)] relative">
+            <div
+              className="absolute left-0 top-0 h-px bg-[#E5342B] transition-all duration-300"
+              style={{ width: `${(step / totalSteps) * 100}%` }}
             />
           </div>
         </div>
 
-        {/* Step content */}
-        <div className="min-h-[160px]">
-          <AnimatePresence mode="wait">
-            {step === 1 && (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.22 }}
-                className="flex flex-col gap-4"
-              >
-                <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-semibold text-[#f4f4f5]">
-                  What should we call you?
-                </h2>
-                <p className="text-sm text-[#71717a]">Your name appears in your dashboard greeting.</p>
-                <Input
-                  label="Full name"
-                  type="text"
-                  placeholder="Priya Sharma"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  autoFocus
-                  onKeyDown={e => { if (e.key === 'Enter') next() }}
-                />
-              </motion.div>
-            )}
+        <div className="p-6 min-h-[280px] flex flex-col gap-4">
+          {step === 1 && (
+            <>
+              <h2 className="text-xl font-bold tracking-tight">What should we call you?</h2>
+              <p className="text-[13px] text-[#7A7A7A]">Shows up in your dashboard header. Nothing else.</p>
+              <Input
+                label="Full name"
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                autoFocus
+                onKeyDown={e => { if (e.key === 'Enter') next() }}
+              />
+            </>
+          )}
 
-            {step === 2 && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.22 }}
-                className="flex flex-col gap-4"
-              >
-                <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-semibold text-[#f4f4f5]">
-                  What&apos;s your branch?
-                </h2>
-                <p className="text-sm text-[#71717a]">Used to organise your tasks and subjects.</p>
-                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
-                  {BRANCHES.map(b => (
-                    <button
-                      key={b}
-                      onClick={() => setBranch(b)}
-                      className={`
-                        px-3 py-2 rounded-xl text-sm text-left transition-colors
-                        ${branch === b
-                          ? 'bg-[rgba(168,85,247,0.2)] border border-[rgba(168,85,247,0.4)] text-[#a855f7]'
-                          : 'bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-[#a1a1aa] hover:border-[rgba(168,85,247,0.3)]'
-                        }
-                      `}
-                    >
-                      {b}
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
+          {step === 2 && (
+            <>
+              <h2 className="text-xl font-bold tracking-tight">Branch?</h2>
+              <p className="text-[13px] text-[#7A7A7A]">Used to label your dashboard footer. That&apos;s it.</p>
+              <div className="grid grid-cols-2 border border-[rgba(255,255,255,0.22)]">
+                {BRANCHES.map(b => (
+                  <button
+                    key={b}
+                    onClick={() => setBranch(b)}
+                    className={`
+                      px-3 py-2.5 text-left text-[13px] transition-colors
+                      border-b border-r border-dashed border-[rgba(255,255,255,0.14)]
+                      ${branch === b
+                        ? 'bg-[#FAFAFA] text-black'
+                        : 'text-[#7A7A7A] hover:text-[#FAFAFA] hover:bg-[#151515]'
+                      }
+                    `}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
 
-            {step === 3 && (
-              <motion.div
-                key="step3"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.22 }}
-                className="flex flex-col gap-4"
-              >
-                <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl font-semibold text-[#f4f4f5]">
-                  Which semester are you in?
-                </h2>
-                <p className="text-sm text-[#71717a]">Helps surface the most relevant info for you.</p>
-                <div className="grid grid-cols-4 gap-2">
-                  {SEMESTERS.map(s => (
-                    <button
-                      key={s}
-                      onClick={() => setSemester(s)}
-                      className={`
-                        aspect-square rounded-xl text-sm font-semibold transition-colors
-                        ${semester === s
-                          ? 'bg-[rgba(168,85,247,0.2)] border border-[rgba(168,85,247,0.4)] text-[#a855f7]'
-                          : 'bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-[#a1a1aa] hover:border-[rgba(168,85,247,0.3)]'
-                        }
-                      `}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {step === 3 && (
+            <>
+              <h2 className="text-xl font-bold tracking-tight">Semester?</h2>
+              <p className="text-[13px] text-[#7A7A7A]">One tap. Done.</p>
+              <div className="grid grid-cols-8 border border-[rgba(255,255,255,0.22)]">
+                {SEMESTERS.map(s => (
+                  <button
+                    key={s}
+                    onClick={() => setSemester(s)}
+                    className={`
+                      py-3 font-[family-name:var(--font-dot-gothic)] text-lg transition-colors
+                      border-r border-[rgba(255,255,255,0.14)] last:border-r-0
+                      ${semester === s
+                        ? 'bg-[#E5342B] text-black'
+                        : 'text-[#7A7A7A] hover:text-[#FAFAFA] hover:bg-[#151515]'
+                      }
+                    `}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          {error && (
+            <p className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#E5342B]">{error}</p>
+          )}
         </div>
 
-        {error && (
-          <p className="text-sm text-[#ef4444] -mt-4">{error}</p>
-        )}
-
-        {/* Navigation */}
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-dashed border-[rgba(255,255,255,0.14)]">
           {step > 1 ? (
             <Button variant="ghost" onClick={() => setStep(s => (s - 1) as Step)}>
-              <ArrowLeft className="w-4 h-4" /> Back
+              ← BACK
             </Button>
           ) : <div />}
 
           {step < 3 ? (
-            <Button onClick={next}>
-              Continue <ArrowRight className="w-4 h-4" />
+            <Button variant="secondary" onClick={next}>
+              CONTINUE →
             </Button>
           ) : (
-            <Button onClick={submit} loading={loading}>
-              <CheckCircle className="w-4 h-4" /> Go to Dashboard
+            <Button variant="primary" onClick={submit} loading={loading}>
+              GO TO DASHBOARD →
             </Button>
           )}
         </div>

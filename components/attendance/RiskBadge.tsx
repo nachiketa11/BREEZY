@@ -5,18 +5,18 @@ interface RiskBadgeProps {
   copy: string
 }
 
-const config: Record<RiskLevel, { label: string; className: string }> = {
-  danger:  { label: 'At risk',  className: 'bg-[rgba(239,68,68,0.12)] text-[#ef4444] border-[rgba(239,68,68,0.3)]' },
-  warning: { label: 'Warning',  className: 'bg-[rgba(245,158,11,0.12)] text-[#f59e0b] border-[rgba(245,158,11,0.3)]' },
-  safe:    { label: 'Safe',     className: 'bg-[rgba(34,211,238,0.10)] text-[#22d3ee] border-[rgba(34,211,238,0.3)]' },
-  perfect: { label: 'Excellent',className: 'bg-[rgba(34,197,94,0.10)] text-[#22c55e] border-[rgba(34,197,94,0.3)]' },
+const config: Record<RiskLevel, { label: string; danger: boolean }> = {
+  danger:  { label: 'AT RISK', danger: true },
+  warning: { label: 'WARNING', danger: true },
+  safe:    { label: 'SAFE', danger: false },
+  perfect: { label: 'CLEAR', danger: false },
 }
 
 export function RiskBadge({ riskLevel, copy }: RiskBadgeProps) {
-  const { label, className } = config[riskLevel]
+  const { label, danger } = config[riskLevel]
   return (
-    <div className={`px-2 py-1 rounded-lg border text-xs font-medium ${className}`}>
-      <span className="font-semibold">{label}</span>
+    <div className={`inline-block px-2 py-1 border font-[family-name:var(--font-jetbrains-mono)] text-[11px] tracking-wide ${danger ? 'text-[#E5342B] border-[rgba(229,52,43,0.5)] bg-[rgba(229,52,43,0.14)]' : 'text-[#7A7A7A] border-[rgba(255,255,255,0.14)]'}`}>
+      <span className="font-medium">{label}</span>
       {' — '}
       {copy}
     </div>

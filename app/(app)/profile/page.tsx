@@ -6,10 +6,8 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Card } from '@/components/ui/Card'
 import { CardSkeleton } from '@/components/ui/Skeleton'
 import { toast } from 'sonner'
-import { LogOut, User } from 'lucide-react'
 
 const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8]
 
@@ -39,7 +37,7 @@ export default function ProfilePage() {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!name.trim() || !branch || !semester) {
-      toast.error('Please fill in all fields')
+      toast.error('Fill in all fields')
       return
     }
     setSaving(true)
@@ -66,7 +64,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="max-w-lg mx-auto flex flex-col gap-6">
+      <div className="max-w-xl mx-auto flex flex-col gap-4">
         <CardSkeleton />
         <CardSkeleton />
       </div>
@@ -74,95 +72,83 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto flex flex-col gap-6">
-      <div>
-        <h1 className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold text-[#f4f4f5]">
-          Profile
-        </h1>
-        <p className="text-sm text-[#71717a] mt-1">{email}</p>
+    <div className="max-w-xl mx-auto">
+      <div className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#454545]">
+        /// PROFILE
+      </div>
+      <div className="mt-2 pb-6 border-b border-dashed border-[rgba(255,255,255,0.14)]">
+        <h1 className="text-2xl font-bold tracking-tight">{name || 'Your profile'}</h1>
+        <p className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#7A7A7A] mt-1">{email}</p>
       </div>
 
-      {/* Edit form */}
-      <Card>
-        <div className="flex items-center gap-2 mb-5">
-          <div className="w-8 h-8 rounded-full bg-[rgba(168,85,247,0.15)] flex items-center justify-center">
-            <User className="w-4 h-4 text-[#a855f7]" />
+      <form onSubmit={handleSave} className="flex flex-col gap-6 mt-6" noValidate>
+        <Input
+          label="Full name"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder="Your name"
+        />
+
+        <div className="flex flex-col gap-2">
+          <span className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#7A7A7A] uppercase tracking-widest">Branch</span>
+          <div className="grid grid-cols-2 border border-[rgba(255,255,255,0.22)]">
+            {BRANCHES.map(b => (
+              <button
+                key={b}
+                type="button"
+                onClick={() => setBranch(b)}
+                className={`
+                  px-3 py-2.5 text-left text-[13px] transition-colors
+                  border-b border-r border-dashed border-[rgba(255,255,255,0.14)]
+                  ${branch === b
+                    ? 'bg-[#FAFAFA] text-black'
+                    : 'text-[#7A7A7A] hover:text-[#FAFAFA] hover:bg-[#0D0D0D]'
+                  }
+                `}
+              >
+                {b}
+              </button>
+            ))}
           </div>
-          <h2 className="font-[family-name:var(--font-space-grotesk)] text-base font-semibold text-[#f4f4f5]">
-            Your details
-          </h2>
         </div>
 
-        <form onSubmit={handleSave} className="flex flex-col gap-5" noValidate>
-          <Input
-            label="Full name"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            placeholder="Priya Sharma"
-          />
-
-          <div className="flex flex-col gap-1.5">
-            <span className="text-sm text-[#a1a1aa] font-medium">Branch</span>
-            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
-              {BRANCHES.map(b => (
-                <button
-                  key={b}
-                  type="button"
-                  onClick={() => setBranch(b)}
-                  className={`
-                    px-3 py-2 rounded-xl text-sm text-left transition-colors
-                    ${branch === b
-                      ? 'bg-[rgba(168,85,247,0.2)] border border-[rgba(168,85,247,0.4)] text-[#a855f7]'
-                      : 'bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-[#a1a1aa] hover:border-[rgba(168,85,247,0.3)]'
-                    }
-                  `}
-                >
-                  {b}
-                </button>
-              ))}
-            </div>
+        <div className="flex flex-col gap-2">
+          <span className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#7A7A7A] uppercase tracking-widest">Semester</span>
+          <div className="grid grid-cols-8 border border-[rgba(255,255,255,0.22)]">
+            {SEMESTERS.map(s => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setSemester(s)}
+                className={`
+                  py-3 font-[family-name:var(--font-dot-gothic)] text-lg transition-colors
+                  border-r border-[rgba(255,255,255,0.14)] last:border-r-0
+                  ${semester === s
+                    ? 'bg-[#E5342B] text-black'
+                    : 'text-[#7A7A7A] hover:text-[#FAFAFA] hover:bg-[#0D0D0D]'
+                  }
+                `}
+              >
+                {s}
+              </button>
+            ))}
           </div>
-
-          <div className="flex flex-col gap-1.5">
-            <span className="text-sm text-[#a1a1aa] font-medium">Semester</span>
-            <div className="grid grid-cols-8 gap-2">
-              {SEMESTERS.map(s => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setSemester(s)}
-                  className={`
-                    aspect-square rounded-xl text-sm font-semibold transition-colors
-                    ${semester === s
-                      ? 'bg-[rgba(168,85,247,0.2)] border border-[rgba(168,85,247,0.4)] text-[#a855f7]'
-                      : 'bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-[#a1a1aa] hover:border-[rgba(168,85,247,0.3)]'
-                    }
-                  `}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <Button type="submit" loading={saving} className="w-full mt-1">
-            Save changes
-          </Button>
-        </form>
-      </Card>
-
-      {/* Logout */}
-      <Card>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-[#f4f4f5]">Sign out</p>
-            <p className="text-xs text-[#71717a] mt-0.5">You&apos;ll be redirected to the landing page</p>
-          </div>
-          <Button variant="danger" size="sm" onClick={handleLogout} loading={loggingOut}>
-            <LogOut className="w-4 h-4" /> Sign out
-          </Button>
         </div>
-      </Card>
+
+        <Button variant="primary" type="submit" loading={saving} className="w-full">
+          SAVE CHANGES
+        </Button>
+      </form>
+
+      <div className="flex items-center justify-between mt-8 pt-6 border-t border-dashed border-[rgba(255,255,255,0.14)]">
+        <div>
+          <p className="text-sm text-[#FAFAFA]">Sign out</p>
+          <p className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#454545] mt-0.5">BACK TO THE LANDING PAGE</p>
+        </div>
+        <Button variant="danger" size="sm" onClick={handleLogout} loading={loggingOut}>
+          SIGN OUT
+        </Button>
+      </div>
     </div>
   )
 }

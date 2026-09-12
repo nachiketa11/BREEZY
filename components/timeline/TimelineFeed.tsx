@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/Input'
 import { CardSkeleton } from '@/components/ui/Skeleton'
 import { todayISO } from '@/utils/date'
 import { format, parseISO, isToday, isTomorrow, isYesterday } from 'date-fns'
-import { CalendarDays, Plus } from 'lucide-react'
 import type { Task, CalendarEvent, TimelineEntry } from '@/types/database'
 import { toast } from 'sonner'
 
@@ -25,10 +24,10 @@ function groupByDate(entries: TimelineEntry[]): Map<string, TimelineEntry[]> {
 
 function sectionLabel(dateStr: string): string {
   const d = parseISO(dateStr)
-  if (isYesterday(d)) return 'Yesterday'
-  if (isToday(d)) return 'Today'
-  if (isTomorrow(d)) return 'Tomorrow'
-  return format(d, 'EEEE, d MMMM')
+  if (isYesterday(d)) return 'YESTERDAY'
+  if (isToday(d)) return 'TODAY'
+  if (isTomorrow(d)) return 'TOMORROW'
+  return format(d, 'EEEE, d MMMM').toUpperCase()
 }
 
 export function TimelineFeed() {
@@ -74,7 +73,7 @@ export function TimelineFeed() {
 
   async function handleAddEvent(e: React.FormEvent) {
     e.preventDefault()
-    if (!eventTitle.trim()) { setTitleError('Title is required'); return }
+    if (!eventTitle.trim()) { setTitleError('TITLE IS REQUIRED'); return }
     setSavingEvent(true)
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -96,53 +95,49 @@ export function TimelineFeed() {
 
   const groups = groupByDate(entries)
   const sortedDates = Array.from(groups.keys()).sort()
-  let globalIndex = 0
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-3xl mx-auto">
+      <div className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#454545]">
+        /// TIMELINE — {entries.length} ENTRIES
+      </div>
+      <div className="flex items-center justify-between gap-4 mt-2 pb-6 border-b border-dashed border-[rgba(255,255,255,0.14)]">
         <div>
-          <h1 className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold text-[#f4f4f5]">
-            Timeline
-          </h1>
-          <p className="text-sm text-[#71717a] mt-1">Tasks and events, chronologically</p>
+          <h1 className="text-2xl font-bold tracking-tight">Timeline</h1>
+          <p className="text-[13px] text-[#7A7A7A] mt-1">Tasks and events, oldest → newest.</p>
         </div>
-        <Button onClick={() => { setEventModalOpen(true); setTitleError('') }} size="sm">
-          <Plus className="w-4 h-4" /> Add event
+        <Button variant="primary" onClick={() => { setEventModalOpen(true); setTitleError('') }} size="sm">
+          + EVENT
         </Button>
       </div>
 
       {loading ? (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col mt-4">
           {[0, 1, 2, 3].map(i => <CardSkeleton key={i} />)}
         </div>
       ) : entries.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 py-16 text-center">
-          <CalendarDays className="w-12 h-12 text-[#3f3f46]" />
-          <div>
-            <p className="text-sm font-medium text-[#71717a]">Nothing scheduled yet</p>
-            <p className="text-xs text-[#52525b] mt-1">Add tasks or events to see your timeline</p>
-          </div>
+        <div className="flex flex-col items-center gap-3 py-16 text-center border-b border-dashed border-[rgba(255,255,255,0.14)]">
+          <div className="font-[family-name:var(--font-dot-gothic)] text-4xl text-[#454545]">—</div>
+          <p className="text-sm text-[#7A7A7A]">Nothing scheduled yet.</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col mt-2">
           {sortedDates.map(date => {
             const dayEntries = groups.get(date)!
-            const isCurrentDay = isToday(parseISO(date))
+            const current = isToday(parseISO(date))
             return (
-              <section key={date}>
+              <section key={date} className="mt-6">
                 <h2
-                  className={`text-xs font-semibold uppercase tracking-widest mb-3 ${
-                    isCurrentDay ? 'text-[#a855f7]' : 'text-[#52525b]'
+                  className={`font-[family-name:var(--font-jetbrains-mono)] text-[11px] tracking-widest mb-1 ${
+                    current ? 'text-[#E5342B]' : 'text-[#454545]'
                   }`}
                 >
-                  {sectionLabel(date)}
+                  {current ? '● ' : ''}{sectionLabel(date)} — {dayEntries.length}
                 </h2>
-                <div className="flex flex-col gap-2">
-                  {dayEntries.map(entry => {
-                    const i = globalIndex++
-                    return <TimelineItem key={entry.id} entry={entry} index={i} />
-                  })}
+                <div className="border-t border-dashed border-[rgba(255,255,255,0.14)]">
+                  {dayEntries.map(entry => (
+                    <TimelineItem key={entry.id} entry={entry} index={0} />
+                  ))}
                 </div>
               </section>
             )
@@ -150,31 +145,33 @@ export function TimelineFeed() {
         </div>
       )}
 
-      <Modal open={eventModalOpen} onClose={() => setEventModalOpen(false)} title="Add event">
-        <form onSubmit={handleAddEvent} className="flex flex-col gap-4" noValidate>
+      <Modal open={eventModalOpen} onClose={() => setEventModalOpen(false)} title="ADD EVENT">
+        <form onSubmit={handleAddEvent} className="flex flex-col gap-5" noValidate>
           <Input
             label="Event title"
-            placeholder="e.g. Semester exam, Lab submission"
+            placeholder="e.g. Semester exam"
             value={eventTitle}
             onChange={e => { setEventTitle(e.target.value); setTitleError('') }}
             error={titleError}
             autoFocus
           />
-          <Input
-            label="Date"
-            type="date"
-            value={eventDate}
-            onChange={e => setEventDate(e.target.value)}
-          />
-          <Input
-            label="Time"
-            type="time"
-            value={eventTime}
-            onChange={e => setEventTime(e.target.value)}
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Date"
+              type="date"
+              value={eventDate}
+              onChange={e => setEventDate(e.target.value)}
+            />
+            <Input
+              label="Time"
+              type="time"
+              value={eventTime}
+              onChange={e => setEventTime(e.target.value)}
+            />
+          </div>
           <div className="flex gap-3">
-            <Button variant="ghost" type="button" onClick={() => setEventModalOpen(false)} className="flex-1">Cancel</Button>
-            <Button type="submit" loading={savingEvent} className="flex-1">Add event</Button>
+            <Button variant="ghost" type="button" onClick={() => setEventModalOpen(false)} className="flex-1">CANCEL</Button>
+            <Button variant="primary" type="submit" loading={savingEvent} className="flex-1">ADD EVENT</Button>
           </div>
         </form>
       </Modal>

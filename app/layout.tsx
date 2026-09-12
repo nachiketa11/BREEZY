@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Space_Grotesk, Inter } from 'next/font/google'
+import { Space_Grotesk, JetBrains_Mono, DotGothic16 } from 'next/font/google'
 import { Toaster } from 'sonner'
 import './globals.css'
 
@@ -9,38 +9,48 @@ const spaceGrotesk = Space_Grotesk({
   display: 'swap',
 })
 
-const inter = Inter({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-jetbrains-mono',
+  display: 'swap',
+})
+
+const dotGothic = DotGothic16({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-dot-gothic',
   display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: 'Breezy — Your Student OS',
-  description: 'Tasks, attendance risk, and your daily schedule — all in one 15-second glance.',
+  title: 'BREEZY — Student OS',
+  description: 'Attendance, tasks and timeline. One raw dashboard, no noise.',
 }
 
 export const viewport: Viewport = {
-  themeColor: '#09090b',
+  themeColor: '#000000',
 }
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${inter.variable} h-full`}
+      className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${dotGothic.variable} h-full`}
     >
-      <body className="min-h-dvh bg-[#09090b] text-[#f4f4f5] font-[family-name:var(--font-inter)] antialiased">
+      <body className="min-h-dvh bg-black text-[#FAFAFA] font-[family-name:var(--font-space-grotesk)] antialiased">
+        <div className="nos-grain" aria-hidden="true" />
         {children}
         <Toaster
           position="bottom-right"
           theme="dark"
           toastOptions={{
             style: {
-              background: 'rgba(24,24,27,0.95)',
-              border: '1px solid rgba(255,255,255,0.10)',
-              color: '#f4f4f5',
-              backdropFilter: 'blur(20px)',
+              background: '#0D0D0D',
+              border: '1px solid rgba(255,255,255,0.22)',
+              borderRadius: 0,
+              color: '#FAFAFA',
+              fontFamily: 'var(--font-jetbrains-mono), monospace',
+              fontSize: 12,
             },
           }}
         />

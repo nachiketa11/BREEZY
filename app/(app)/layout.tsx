@@ -4,12 +4,15 @@ import type { ReactNode } from 'react'
 
 export default function AuthenticatedLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-dvh pb-16 md:pb-0">
+    <div className="flex min-h-dvh bg-black">
       <NavBar />
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col min-w-0">
         <PageTransition>
-          <div className="h-full overflow-y-auto px-4 py-6 md:px-8 md:py-8">
-            {children}
+          {/* mobile top bar offset */}
+          <div className="pt-[104px] md:pt-0">
+            <div className="nos-wrap py-0">
+              <div className="py-6 md:py-8">{children}</div>
+            </div>
           </div>
         </PageTransition>
       </main>

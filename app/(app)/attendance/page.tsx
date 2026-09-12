@@ -8,7 +8,6 @@ import { Modal } from '@/components/ui/Modal'
 import { Input } from '@/components/ui/Input'
 import { CardSkeleton } from '@/components/ui/Skeleton'
 import { enrichAttendance, sortByRisk } from '@/utils/attendance-math'
-import { GraduationCap, Plus } from 'lucide-react'
 
 export default function AttendancePage() {
   const { records, loading, addSubject, logClass, deleteSubject } = useAttendance()
@@ -18,12 +17,15 @@ export default function AttendancePage() {
   const [saving, setSaving] = useState(false)
 
   const enriched = sortByRisk(records.map(enrichAttendance))
+  const totalAtt = records.reduce((s, r) => s + r.attended, 0)
+  const totalTot = records.reduce((s, r) => s + r.total, 0)
+  const overall = totalTot === 0 ? 0 : Math.round((totalAtt / totalTot) * 100)
 
   async function handleAddSubject(e: React.FormEvent) {
     e.preventDefault()
-    if (!newSubject.trim()) { setSubjectError('Enter a subject name'); return }
+    if (!newSubject.trim()) { setSubjectError('ENTER A SUBJECT NAME'); return }
     if (records.some(r => r.subject.toLowerCase() === newSubject.trim().toLowerCase())) {
-      setSubjectError('Subject already added'); return
+      setSubjectError('SUBJECT ALREADY ADDED'); return
     }
     setSaving(true)
     await addSubject(newSubject.trim())
@@ -33,46 +35,54 @@ export default function AttendancePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-3xl mx-auto">
+      <div className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#454545]">
+        /// ATTENDANCE — LINE IS 75%
+      </div>
+
+      <div className="flex items-center justify-between gap-4 mt-2 pb-6 border-b border-dashed border-[rgba(255,255,255,0.14)]">
         <div>
-          <h1 className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold text-[#f4f4f5]">
-            Attendance
+          <h1 className="text-2xl font-bold tracking-tight">
+            Attendance{' '}
+            {totalTot > 0 && (
+              <span className={`font-[family-name:var(--font-dot-gothic)] font-normal text-xl ml-1 ${overall < 75 ? 'text-[#E5342B]' : 'text-[#7A7A7A]'}`}>
+                {overall}%
+              </span>
+            )}
           </h1>
-          <p className="text-sm text-[#71717a] mt-1">Track your class attendance per subject</p>
+          <p className="text-[13px] text-[#7A7A7A] mt-1">
+            {totalTot === 0 ? 'Add subjects, then log every class. No faking.' : `${totalAtt}/${totalTot} classes overall. Sorted worst-first.`}
+          </p>
         </div>
-        <Button onClick={() => { setModalOpen(true); setSubjectError(''); setNewSubject('') }} size="sm">
-          <Plus className="w-4 h-4" /> Add subject
+        <Button variant="primary" onClick={() => { setModalOpen(true); setSubjectError(''); setNewSubject('') }} size="sm">
+          + SUBJECT
         </Button>
       </div>
 
       {loading ? (
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="flex flex-col mt-4">
           {[0, 1, 2].map(i => <CardSkeleton key={i} />)}
         </div>
       ) : enriched.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 py-16 text-center">
-          <GraduationCap className="w-12 h-12 text-[#3f3f46]" />
-          <div>
-            <p className="text-sm font-medium text-[#71717a]">No subjects tracked yet</p>
-            <p className="text-xs text-[#52525b] mt-1">
-              Add your subjects and log every class to see your attendance risk
-            </p>
-          </div>
+        <div className="flex flex-col items-center gap-4 py-16 text-center border-b border-dashed border-[rgba(255,255,255,0.14)]">
+          <div className="font-[family-name:var(--font-dot-gothic)] text-4xl text-[#454545]">%</div>
+          <p className="text-sm text-[#7A7A7A]">No subjects tracked yet.</p>
+          <p className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-[#454545]">ADD THEM ONE BY ONE. LOG AFTER EVERY CLASS.</p>
           <Button onClick={() => setModalOpen(true)} variant="secondary" size="sm">
-            <Plus className="w-4 h-4" /> Add your first subject
+            + ADD YOUR FIRST SUBJECT
           </Button>
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 gap-0 mt-4 border-b border-l border-r border-dashed border-[rgba(255,255,255,0.14)]">
           {enriched.map((record, i) => (
-            <AttendanceCard
-              key={record.id}
-              record={record}
-              index={i}
-              onLogClass={(attended) => logClass(record.id, attended)}
-              onDelete={() => deleteSubject(record.id)}
-            />
+            <div key={record.id} className="border-r border-dashed border-[rgba(255,255,255,0.14)] last:border-r-0 sm:[&:nth-child(2n)]:border-r-0">
+              <AttendanceCard
+                record={record}
+                index={i}
+                onLogClass={(attended) => logClass(record.id, attended)}
+                onDelete={() => deleteSubject(record.id)}
+              />
+            </div>
           ))}
         </div>
       )}
@@ -80,12 +90,12 @@ export default function AttendancePage() {
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        title="Add subject"
+        title="ADD SUBJECT"
       >
-        <form onSubmit={handleAddSubject} className="flex flex-col gap-4" noValidate>
+        <form onSubmit={handleAddSubject} className="flex flex-col gap-5" noValidate>
           <Input
             label="Subject name"
-            placeholder="e.g. Algorithms & Data Structures"
+            placeholder="e.g. Data Structures"
             value={newSubject}
             onChange={e => { setNewSubject(e.target.value); setSubjectError('') }}
             error={subjectError}
@@ -93,10 +103,10 @@ export default function AttendancePage() {
           />
           <div className="flex gap-3">
             <Button variant="ghost" type="button" onClick={() => setModalOpen(false)} className="flex-1">
-              Cancel
+              CANCEL
             </Button>
-            <Button type="submit" loading={saving} className="flex-1">
-              Add subject
+            <Button variant="primary" type="submit" loading={saving} className="flex-1">
+              ADD SUBJECT
             </Button>
           </div>
         </form>

@@ -1,93 +1,97 @@
 @import "tailwindcss";
 
-/* ── Midnight Glass Design Tokens ─────────────────────────────────────── */
+/* ── NOTHING OS TOKENS — BREEZY ─────────────────────────────────── */
 @theme inline {
-  /* Colors */
-  --color-background: #09090b;
-  --color-surface: rgba(255, 255, 255, 0.06);
-  --color-border: rgba(255, 255, 255, 0.10);
-  --color-purple: #a855f7;
-  --color-purple-dim: rgba(168, 85, 247, 0.15);
-  --color-cyan: #22d3ee;
-  --color-cyan-dim: rgba(34, 211, 238, 0.15);
-  --color-amber: #f59e0b;
-  --color-red-risk: #ef4444;
-  --color-text-primary: #f4f4f5;
-  --color-text-secondary: #a1a1aa;
-  --color-text-muted: #52525b;
+  --color-nos-bg: #000000;
+  --color-nos-surface: #0d0d0d;
+  --color-nos-alt: #151515;
+  --color-nos-border: rgba(255, 255, 255, 0.14);
+  --color-nos-border-solid: rgba(255, 255, 255, 0.22);
+  --color-nos-text: #fafafa;
+  --color-nos-dim: #7a7a7a;
+  --color-nos-faint: #454545;
+  --color-nos-red: #e5342b;
+  --color-nos-red-dim: rgba(229, 52, 43, 0.14);
 
-  /* Fonts */
-  --font-heading: var(--font-space-grotesk), system-ui, sans-serif;
-  --font-body: var(--font-inter), system-ui, sans-serif;
-
-  /* Radius */
-  --radius-card: 16px;
-  --radius-sm: 8px;
-
-  /* Spacing */
-  --spacing-grid: 8px;
-
-  /* Shadows */
-  --shadow-glass: 0 4px 24px rgba(0, 0, 0, 0.4);
-  --shadow-glow-purple: 0 0 20px rgba(168, 85, 247, 0.3);
-  --shadow-glow-cyan: 0 0 20px rgba(34, 211, 238, 0.3);
+  --font-nos-body: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-nos-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-nos-dot: var(--font-dot-gothic), monospace;
 }
 
-/* ── Base Styles ──────────────────────────────────────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
+:root {
+  --bg: #000000;
+  --surface: #0d0d0d;
+  --surface-alt: #151515;
+  --border: rgba(255, 255, 255, 0.14);
+  --border-solid: rgba(255, 255, 255, 0.22);
+  --text: #fafafa;
+  --text-dim: #7a7a7a;
+  --text-faint: #454545;
+  --red: #e5342b;
+  --red-dim: rgba(229, 52, 43, 0.14);
 }
+
+*, *::before, *::after { box-sizing: border-box; }
 
 html {
-  background-color: #09090b;
-  color: #f4f4f5;
-  font-family: var(--font-body);
+  background: #000;
+  color: var(--text);
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
   scroll-behavior: smooth;
 }
 
 body {
-  background-color: #09090b;
-  color: #f4f4f5;
+  background: #000;
+  color: var(--text);
   min-height: 100dvh;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Focus Ring (WCAG AA, 2px cyan) ──────────────────────────────────── */
+::selection { background: var(--red); color: #fff; }
+
 :focus-visible {
-  outline: 2px solid #22d3ee;
+  outline: 1px solid var(--red);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
-/* ── Glass Card Utility ───────────────────────────────────────────────── */
-.glass {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: 16px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+/* dotted grain backdrop */
+.nos-grain {
+  position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 22px 22px;
 }
 
-/* ── Scrollbar Styling ────────────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
+.nos-wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 2; }
+@media (max-width: 800px) { .nos-wrap { padding: 0 20px; } }
+
+/* raw scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border: 2px solid #000; }
+::-webkit-scrollbar-thumb:hover { background: var(--red); }
+
+/* square checkbox tick */
+.nos-check {
+  width: 16px; height: 16px;
+  border: 1px solid var(--border-solid);
+  flex-shrink: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
   background: transparent;
+  transition: background 0.12s ease;
 }
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
+.nos-check:hover { border-color: var(--text); }
+.nos-check.done { background: var(--text); border-color: var(--text); }
 
-/* ── Selection ────────────────────────────────────────────────────────── */
-::selection {
-  background: rgba(168, 85, 247, 0.3);
-  color: #f4f4f5;
-}
+/* blinking status dot */
+@keyframes nos-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+.nos-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: nos-pulse 2s infinite; }
+@media (prefers-reduced-motion: reduce) { .nos-pulse { animation: none; } }
+
+/* dashed rule helper */
+.nos-rule-b { border-bottom: 1px dashed var(--border); }
+.nos-rule-t { border-top: 1px dashed var(--border); }
+
+input[type="date"], input[type="time"] { color-scheme: dark; }
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }

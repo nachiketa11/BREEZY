@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
@@ -15,23 +14,23 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<Variant, string> = {
   primary:
-    'bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-[0_0_16px_rgba(168,85,247,0.3)]',
+    'bg-[#E5342B] border-[#E5342B] text-black hover:bg-[#ff473d] hover:border-[#ff473d]',
   secondary:
-    'bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.12)] text-[#f4f4f5] border border-[rgba(255,255,255,0.10)]',
+    'bg-transparent text-[#FAFAFA] border-[rgba(255,255,255,0.22)] hover:bg-[#151515]',
   ghost:
-    'bg-transparent hover:bg-[rgba(255,255,255,0.06)] text-[#a1a1aa] hover:text-[#f4f4f5]',
+    'bg-transparent border-transparent text-[#7A7A7A] hover:text-[#FAFAFA] hover:bg-[#151515]',
   danger:
-    'bg-[rgba(239,68,68,0.15)] hover:bg-[rgba(239,68,68,0.25)] text-[#ef4444] border border-[rgba(239,68,68,0.3)]',
+    'bg-transparent text-[#E5342B] border-[rgba(229,52,43,0.5)] hover:bg-[rgba(229,52,43,0.14)]',
 }
 
 const sizeStyles: Record<Size, string> = {
-  sm: 'px-3 py-1.5 text-sm rounded-lg',
-  md: 'px-4 py-2 text-sm rounded-xl',
-  lg: 'px-6 py-3 text-base rounded-xl',
+  sm: 'px-3 py-2 text-xs',
+  md: 'px-5 py-3 text-[13px]',
+  lg: 'px-6 py-3.5 text-[13px]',
 }
 
 export function Button({
-  variant = 'primary',
+  variant = 'secondary',
   size = 'md',
   loading = false,
   children,
@@ -40,26 +39,24 @@ export function Button({
   ...props
 }: ButtonProps) {
   return (
-    <motion.button
-      whileTap={{ scale: 0.97 }}
-      transition={{ duration: 0.1 }}
+    <button
       className={`
-        inline-flex items-center justify-center gap-2 font-medium
-        transition-colors duration-150 cursor-pointer
-        disabled:opacity-50 disabled:cursor-not-allowed
-        focus-visible:outline-2 focus-visible:outline-[#22d3ee] focus-visible:outline-offset-2
+        inline-flex items-center justify-center gap-2 font-medium rounded-none
+        font-[family-name:var(--font-jetbrains-mono)] uppercase tracking-wide
+        border transition-colors duration-150 cursor-pointer
+        disabled:opacity-40 disabled:cursor-not-allowed
         ${variantStyles[variant]} ${sizeStyles[size]} ${className}
       `}
       disabled={disabled || loading}
-      {...(props as object)}
+      {...props}
     >
       {loading && (
-        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+        <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
         </svg>
       )}
       {children}
-    </motion.button>
+    </button>
   )
 }
