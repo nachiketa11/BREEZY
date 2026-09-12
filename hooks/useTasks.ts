@@ -9,16 +9,15 @@ export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
 
-  const supabase = createClient()
-
   const fetchTasks = useCallback(async () => {
+    const supabase = createClient()
     const { data, error } = await supabase
       .from('tasks')
       .select('*')
       .order('due_date', { ascending: true })
     if (!error && data) setTasks(data as Task[])
     setLoading(false)
-  }, [supabase])
+  }, [])
 
   useEffect(() => {
     fetchTasks()
@@ -26,6 +25,7 @@ export function useTasks() {
 
   const addTask = useCallback(
     async (payload: Omit<Task, 'id' | 'user_id' | 'completed'>) => {
+      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
@@ -48,11 +48,12 @@ export function useTasks() {
       setTasks(prev => prev.map(t => (t.id === tempId ? (data as Task) : t)))
       toast.success('Task added')
     },
-    [supabase]
+    []
   )
 
   const updateTask = useCallback(
     async (id: string, updates: Partial<Omit<Task, 'id' | 'user_id'>>) => {
+      const supabase = createClient()
       const prev = tasks.find(t => t.id === id)
       if (!prev) return
 
@@ -67,7 +68,7 @@ export function useTasks() {
         toast.error('Failed to update task')
       }
     },
-    [tasks, supabase]
+    [tasks]
   )
 
   const toggleComplete = useCallback(
@@ -81,6 +82,7 @@ export function useTasks() {
 
   const deleteTask = useCallback(
     async (id: string) => {
+      const supabase = createClient()
       const snapshot = tasks
       setTasks(prev => prev.filter(t => t.id !== id))
 
@@ -92,7 +94,7 @@ export function useTasks() {
       }
       toast.success('Task deleted')
     },
-    [tasks, supabase]
+    [tasks]
   )
 
   return { tasks, loading, addTask, updateTask, toggleComplete, deleteTask, refetch: fetchTasks }
