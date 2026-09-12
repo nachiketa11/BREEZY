@@ -9,16 +9,15 @@ export function useAttendance() {
   const [records, setRecords] = useState<AttendanceRecord[]>([])
   const [loading, setLoading] = useState(true)
 
-  const supabase = createClient()
-
   const fetchRecords = useCallback(async () => {
+    const supabase = createClient()
     const { data, error } = await supabase
       .from('attendance')
       .select('*')
       .order('subject', { ascending: true })
     if (!error && data) setRecords(data as AttendanceRecord[])
     setLoading(false)
-  }, [supabase])
+  }, [])
 
   useEffect(() => {
     fetchRecords()
@@ -26,6 +25,7 @@ export function useAttendance() {
 
   const addSubject = useCallback(
     async (subject: string) => {
+      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
@@ -47,7 +47,7 @@ export function useAttendance() {
       setRecords(prev => prev.map(r => (r.id === tempId ? (data as AttendanceRecord) : r)))
       toast.success(`${subject} added`)
     },
-    [supabase]
+    []
   )
 
   /**
@@ -55,6 +55,7 @@ export function useAttendance() {
    */
   const logClass = useCallback(
     async (id: string, attended: boolean) => {
+      const supabase = createClient()
       const record = records.find(r => r.id === id)
       if (!record) return
 
@@ -73,11 +74,12 @@ export function useAttendance() {
         toast.error('Failed to log class')
       }
     },
-    [records, supabase]
+    [records]
   )
 
   const deleteSubject = useCallback(
     async (id: string) => {
+      const supabase = createClient()
       const snapshot = records
       setRecords(prev => prev.filter(r => r.id !== id))
 
@@ -89,7 +91,7 @@ export function useAttendance() {
       }
       toast.success('Subject removed')
     },
-    [records, supabase]
+    [records]
   )
 
   return { records, loading, addSubject, logClass, deleteSubject, refetch: fetchRecords }
